@@ -46,7 +46,7 @@ class TestValidateMambaExtraBufferLazyDflash(CustomTestCase):
         ), mock.patch(
             # Keep the test runnable on CPU-only hosts: the platform assert is
             # not what is under test here.
-            "sglang.srt.server_args.is_cuda",
+            "sglang.srt.arg_groups.mamba_hook.is_cuda",
             return_value=True,
         ):
             ServerArgs._validate_mamba_extra_buffer(
