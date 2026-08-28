@@ -471,8 +471,12 @@ class TestResolutionReadsTheDeclarations(CustomTestCase):
 
     def test_no_handler_reads_a_field_off_self(self):
         handlers = _resolution_handlers()
+        # The pipeline lives in `arg_groups/` now, so what the dispatcher still
+        # reaches inside the class is a handful of read wrappers rather than the
+        # old fifty-odd handlers. The other side is covered by
+        # `test_no_hook_reads_a_field_off_the_record`, which walks the package.
         self.assertGreater(
-            len(handlers), 50, f"only {len(handlers)} handlers were reached"
+            len(handlers), 3, f"only {len(handlers)} handlers were reached"
         )
         offenders = []
         for name, fn in sorted(handlers.items()):
@@ -492,7 +496,9 @@ class TestResolutionReadsTheDeclarations(CustomTestCase):
             len(decided), 100, f"the declaration set derived only {len(decided)} fields"
         )
         members = _record_members()
-        self.assertGreater(len(members), 100, f"only {len(members)} members were found")
+        # Dropped from >100 when the forwarding slots went: the floor is here to
+        # catch the scan collapsing, not to pin the class's size.
+        self.assertGreater(len(members), 40, f"only {len(members)} members were found")
         offenders = []
         for name, fn in sorted(members.items()):
             holders = _holders(fn) | {"self"}

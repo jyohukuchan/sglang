@@ -9,13 +9,13 @@ from unittest import mock
 
 import torch
 
+from sglang.srt.arg_groups.mamba_hook import validate_mamba_extra_buffer
 from sglang.test.ci.ci_register import register_cuda_ci
 from sglang.test.test_utils import CustomTestCase
 
 register_cuda_ci(est_time=10, stage="base-b", runner_config="1-gpu-small")
 
 from sglang.srt.model_executor.forward_batch_info import ForwardMode
-from sglang.srt.server_args import ServerArgs
 from sglang.srt.speculative import dflash_info
 from sglang.srt.speculative.dflash_info import DFlashVerifyInput
 
@@ -49,8 +49,10 @@ class TestValidateMambaExtraBufferLazyDflash(CustomTestCase):
             "sglang.srt.arg_groups.mamba_hook.is_cuda",
             return_value=True,
         ):
-            ServerArgs._validate_mamba_extra_buffer(
-                fake_self, view, "Qwen3NextForCausalLM"
+            validate_mamba_extra_buffer(
+                view,
+                "Qwen3NextForCausalLM",
+                mamba_cache_chunk_size=fake_self.mamba_cache_chunk_size,
             )
 
     def test_dflash_with_extra_buffer_lazy_is_accepted(self):
